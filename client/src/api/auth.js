@@ -8,6 +8,4 @@ export const loginRequest = user => instancia.post(`/auth/login`,user)
 
 export const logoutRequest = () => instancia.get('/auth/logout')
 
-export const verifyTokenRequest = () => {
-  return instancia.get('/auth/verificar')
-}
+export const verifyTokenRequest = () => instancia.get('/auth/verificar')

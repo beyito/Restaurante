@@ -5,6 +5,6 @@ export const {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None',
-    maxAge: 1000 * 60 * 60
+    maxAge: 1000 * 60 * 60 * 2
   }
 } = process.env
