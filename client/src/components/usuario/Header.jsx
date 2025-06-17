@@ -11,6 +11,7 @@ export function Header({ isAuthenticated, user, signOut }) {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { email, userName } = user?.user || { email: "anonimos@gmail.com", userName: "Anonimos" }
+  console.log(userName)
   const routes = [
     { to: "/login", label: "Inicio" },
     { to: "/", label: "Menú" },
