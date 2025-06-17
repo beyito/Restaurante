@@ -41,7 +41,10 @@ export const CreateApp = async ({
   app.use(express.json())
 
   app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: [
+      'http://localhost:5173', // frontend local
+      'https://restaurante-6.onrender.com/' // cambia esto por el dominio real de tu frontend
+    ],
     credentials: true
   }))
 
