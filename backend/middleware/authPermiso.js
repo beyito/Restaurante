@@ -2,11 +2,12 @@ export const autenticacion = (token) => {
   return (req, res, next) => {
     try {
       const tokenCookie = req.cookies.access_token
-      console.log(token)
+      console.log('Token recibido:', tokenCookie)
       if (!tokenCookie) {
         return res.status(401).json({ error: 'Acceso no autorizado' })
       }
       const decodificacion = token.verificarToken(tokenCookie)
+      console.log('Token decodificado:', decodificacion)
       req.user = decodificacion
       next()
     } catch (error) {
