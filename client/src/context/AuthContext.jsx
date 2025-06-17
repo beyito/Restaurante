@@ -109,7 +109,7 @@ export const AuthProvide = ({ children }) => {
         return setUser(null)
       }
       try {
-        const res = await verifyTokenRequest(cookies.access_token)
+        const res = await verifyTokenRequest()
         if (!res.data) {
           setLoading(false)
           return setIsAuthenticated(false)
