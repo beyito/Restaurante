@@ -1,7 +1,7 @@
 import express, { json } from 'express'
 import { PORT } from './config/config.js'
 import { db } from './connection.js'
-
+import helmet from 'helmet'
 import { crearAuthRutas } from './routes/auth.js'
 
 import { crearRutasRoles } from './routes/roles.js'
@@ -35,7 +35,8 @@ export const CreateApp = async ({
 
   const token = new Token(PALABRA_SECRETA)
   modeloAuth.token = token
-
+  app.disable('x-powered-by')
+  app.use(helmet())
   app.use(cookieParser())
   app.use(json())
   app.use(express.json())
