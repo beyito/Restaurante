@@ -9,7 +9,11 @@ export const CartLayout = () => {
   return (
     <CartProvider>
       <div className="relative not-first:h-full">
-        <Header isAuthenticated={isAuthenticated} user={user} signOut={signOut} />
+        {isAuthenticated ? (
+          <Header isAuthenticated={isAuthenticated} user={user} signOut={signOut} />
+        ) : (
+          <Link to="/login" className="text-blue-500">Iniciar sesión</Link>
+        )}
         <Outlet />
       </div>
     </CartProvider>
