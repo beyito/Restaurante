@@ -41,7 +41,7 @@ export const CreateApp = async ({
   app.use(express.json())
 
   app.use(cors({
-    origin: 'https://restaurante-m2i3.vercel.app/', // cambia esto por el dominio real de tu frontend
+    origin: 'https://restaurante-m2i3.vercel.app', // cambia esto por el dominio real de tu frontend
     credentials: true
   }))
 
