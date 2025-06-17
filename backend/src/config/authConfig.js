@@ -6,7 +6,6 @@ export const {
     secure: true, // Siempre true en producción (HTTPS obligatorio)
     sameSite: 'strict', // Más restrictivo que 'lax' para seguridad
     maxAge: 1000 * 60 * 60 * 24 * 7, // Ejemplo: 1 semana (ajusta según necesites)
-    domain: 'restaurante-6.onrender.com', // Especifica tu dominio en producción
     path: '/', // Disponible en todas las rutas
     signed: true // Recomendado para cookies importan
   }
