@@ -3,8 +3,8 @@ export const {
   expiresIn = '1h',
   cookieOptions = {
     httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'None',
     maxAge: 1000 * 60 * 60
   }
 } = process.env
