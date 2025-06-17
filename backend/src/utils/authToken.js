@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 export class Token {
-  constructor (PALABRA_SECRETA, expiresIn = '1hr') {
+  constructor (PALABRA_SECRETA, expiresIn = '1h') {
     this.secreto = PALABRA_SECRETA
     this.expiracionToken = expiresIn
   }
