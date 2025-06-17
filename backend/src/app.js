@@ -37,6 +37,10 @@ export const CreateApp = async ({
   modeloAuth.token = token
   app.disable('x-powered-by')
   app.use(helmet())
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+  })
   app.use(cookieParser())
   app.use(json())
   app.use(express.json())
