@@ -11,41 +11,32 @@ export class ModeloAuth {
     });
   }
 
-  async login({ input }) {
-    try {
-      const { nombreUsuario, password } = input;
-      
-      const usuario = await this.Usuario.findOne({
-        where: { nombreUsuario },
-        attributes: ['id', 'nombreUsuario', 'correo', 'password', 'idRol']
-      });
-
-      if (!usuario) return { error: 'Credenciales inválidas' };
-
-      const passwordValido = await bcrypt.compare(password, usuario.password);
-      if (!passwordValido) return { error: 'Credenciales inválidas' };
-
-      const token = this.tokenService.crearToken({
-        id: usuario.id,
-        nombreUsuario: usuario.nombreUsuario,
-        rol: usuario.idRol
-      });
-
-      return {
-        user: {
-          id: usuario.id,
-          nombreUsuario: usuario.nombreUsuario,
-          correo: usuario.correo,
-          rol: usuario.idRol
-        },
-        token
-      };
-
-    } catch (error) {
-      console.error('Error en ModeloAuth.login:', error);
-      throw new Error('Error en autenticación');
-    }
-  }
+   async login ({ input }) {
+       const { nombreUsuario, password } = input.data
+       try {
+         const buscarUsuario = await this.Usuario.findOne({
+           where: { nombreUsuario }
+         })
+         if (!buscarUsuario) return { error: 'Usuario no encontrado' }
+         const verificarPassword = await bcrypt.compare(password, buscarUsuario.password)
+         if (!verificarPassword) return { error: 'Password incorrecto' }
+         const nuevoToken = this.token.crearToken({
+           id: buscarUsuario.id,
+           nombreUsuario: buscarUsuario.nombreUsuario,
+           rol: buscarUsuario.idRol
+         })
+         return {
+           user: {
+             nombreUsuario: buscarUsuario.nombreUsuario,
+             correo: buscarUsuario.correo,
+             rol: buscarUsuario.idRol
+           },
+           nuevoToken
+         }
+       } catch (error) {
+         throw new Error('Error al loguearse')
+       }
+     }
 
  async perfil ({ input }) {
     const id = input.id

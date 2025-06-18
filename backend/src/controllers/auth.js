@@ -7,28 +7,25 @@ export class ControladorAuth {
   }
 
   login = async (req, res) => {
-    try {
-      const resultado = ValidacionDatosUsuario.loginUser(req.body);
-      if (!resultado.success) {
-        return res.status(400).json({ error: resultado.error });
-      }
+      const resultado = ValidacionDatosUsuario.loginUser(req.body)
+      if (!resultado.success) return res.status(401).json({ error: resultado.error })
+      const usuario = await this.ModeloAuth.login({ input: resultado })
+      if (usuario.error) return res.status(400).json({ error: usuario.error })
+           const token = jwt.sign(
+      { id: usuario.id, rol: usuario.idRol },
+      process.env.PALABRA_SECRETA,
+      { expiresIn: '2h' }
+    );
 
-      const { user, token, error } = await this.modeloAuth.login({ 
-        input: resultado.data 
-      });
-
-      if (error) return res.status(401).json({ error });
-
-      return res
-        .status(200)
-        .cookie('access_token', token, cookieOptions)
-        .json({ user });
-
-    } catch (error) {
-      console.error('Error en ControladorAuth.login:', error);
-      return res.status(500).json({ error: 'Error en servidor' });
+    console.log('Login exitoso para:', usuario.nombreUsuario);
+      return res.cookie('access_token', usuario.nuevoToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: '.onrender.com',
+      maxAge: 2 * 60 * 60 * 1000
+    }).json(usuario.user)
     }
-  };
 
   perfil = async (req, res) => {
     try {
@@ -43,7 +40,7 @@ export class ControladorAuth {
     }
   };
 
-  logout = (req, res) => {
+  logout = async (req, res) => {
     res.clearCookie('access_token', cookieOptions);
     return res.status(200).json({ message: 'Sesión cerrada' });
   };
