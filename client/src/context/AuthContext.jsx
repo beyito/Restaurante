@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useNavigate } from "react-router-dom";
 import { 
   registerRequest, 
   loginRequest, 
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
   const [isLoading, setLoading] = useState(true);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   // Configuración global de Axios
   useEffect(() => {
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       await logoutRequest();
       setUser(null);
       setIsAuthenticated(false);
-      router.push("/login");
+      navigate("/login");
     } catch (error) {
       handleAuthError(error);
     }
