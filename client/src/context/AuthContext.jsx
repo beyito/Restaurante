@@ -1,118 +1,148 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { 
-  registerRequest, 
-  loginRequest, 
-  verifyTokenRequest, 
-  logoutRequest 
-} from "../api/auth";
+import { registerRequest, loginRequest, verifyTokenRequest, logoutRequest } from "../api/auth.js";
 
-const AuthContext = createContext();
+import Cookies from 'js-cookie'
+import { actualizarPerfil } from "@/api/cliente/actualizarPerfil.js";
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [errors, setErrors] = useState([]);
-  const [isLoading, setLoading] = useState(true);
-  const navigate = useNavigate();
+const AuthContext = createContext()
 
-  // Configuración global de Axios
-  useEffect(() => {
-    axios.defaults.withCredentials = true;
-    axios.defaults.baseURL = "https://restaurante-jbe5.onrender.com";
-  }, []);
+//hook para importar el useContext
+//para exporta automaticamente el uso de contexto
+function useAuth() {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error("useAuth deberia estar dentro de un AuthProvider");
+  }
+  return context
+}
 
-  const signUp = async (userData) => {
+export { useAuth };
+
+// para guardar el contexto del usuario y poder ocupar sus datos
+// otras paginas
+export const AuthProvide = ({ children }) => {
+
+  const [user, setUser] = useState(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [errors, setErrors] = useState([])
+  const [isLoading, setLoading] = useState(true)
+
+
+  const signUp = async (user) => {
     try {
-      const res = await registerRequest(userData);
-      await verifyAuth();
-      return { success: true, data: res.data };
+      //paso 1
+      const res = await registerRequest(user);
+      setUser(res.data)
+      //paso 2
+      setIsAuthenticated(true)
     } catch (error) {
-      handleAuthError(error);
-      return { success: false, error };
+      //paso 3
+      const msjDeError = error?.response?.data?.error || "Ocurrio un error inesperado"
+      setErrors([{ msg: msjDeError }])
     }
-  };
+  }
 
-  const signIn = async (credentials) => {
+  const signIn = async (user) => {
     try {
-      const res = await loginRequest(credentials);
-      await verifyAuth();
-      return { success: true, data: res.data };
+      const res = await loginRequest(user)
+      setUser(res.data)
+      setIsAuthenticated(true)
     } catch (error) {
-      handleAuthError(error);
-      return { success: false, error };
+      const msjDeError = error?.response?.data?.error || "Ocurrio un error inesperado"
+      setErrors([{ msg: msjDeError }])
+      console.log(error)
     }
-  };
+  }
 
   const signOut = async () => {
     try {
-      await logoutRequest();
-      setUser(null);
-      setIsAuthenticated(false);
-      navigate("/login");
+      await logoutRequest()
+      setUser(null)
+      setIsAuthenticated(false)
     } catch (error) {
-      handleAuthError(error);
+      setErrors([{ msg: "Error al cerrar sesión" }])
+      console.log(error)
     }
-  };
+  }
 
-  const verifyAuth = async () => {
+  const editarUsuario = async (id, user) => {
     try {
-      const res = await verifyTokenRequest();
-      if (res.data) {
-        setUser(res.data);
-        setIsAuthenticated(true);
-        return true;
+      const res = await actualizarPerfil(id, user)
+      if (!res.data) {
+        throw new Error("No se recibieron datos en la respuesta")
       }
-      return false;
+      setUser(res.data)
+      setIsAuthenticated(true);
+      return { success: true, data: res.data }
     } catch (error) {
-      handleAuthError(error);
-      return false;
-    } finally {
-      setLoading(false);
+      const msjDeError = error?.response?.data?.error || "Ocurrio un error inesperado"
+      setErrors([{ msg: msjDeError }])
+    }
+  }
+
+  const reloadUser = async () => {
+    try {
+      const res = await verifyTokenRequest('/auth/verificar');
+      setUser(res.data);
+    } catch (error) {
+      console.error("Error recargando usuario:", error);
     }
   };
 
-  const handleAuthError = (error) => {
-    const errorMsg = error?.response?.data?.error || "Error de autenticación";
-    setErrors([{ msg: errorMsg }]);
-    setIsAuthenticated(false);
-    setUser(null);
-  };
-
-  useEffect(() => {
-    verifyAuth();
-  }, []);
-
+  //para eliminar los errores que aparecen en el form
   useEffect(() => {
     if (errors.length > 0) {
-      const timer = setTimeout(() => setErrors([]), 5000);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        setErrors([])
+      }, 2000)
+      return () => clearTimeout(timer)
     }
-  }, [errors]);
+  }, [errors])
+  //para guardar la cookie con js-cookie
+ useEffect(() => {
+  async function checkLogin() {
+    const cookies = Cookies.get();
+
+    if (!cookies.access_token) {
+      setIsAuthenticated(false)
+      setLoading(false)
+      return setUser(null)
+    }
+
+    try {
+      const res = await verifyTokenRequest()
+      if (!res.data) {
+        setLoading(false)
+        return setIsAuthenticated(false)
+      }
+      setIsAuthenticated(true)
+      setUser(res.data) // 👈 Aquí debería entrar bien
+      setLoading(false)
+    } catch (error) {
+      setIsAuthenticated(false)
+      setUser(null)
+      setLoading(false)
+      console.log(error)
+    }
+  }
+
+  checkLogin()
+}, [isAuthenticated])
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated,
-        isLoading,
-        errors,
-        signUp,
-        signIn,
-        signOut,
-        verifyAuth,
-      }}
-    >
+    <AuthContext.Provider value={{
+      signUp,
+      signIn,
+      signOut,
+      editarUsuario,
+      reloadUser,
+      user,
+      isAuthenticated,
+      isLoading,
+      errors,
+
+    }}>
       {children}
     </AuthContext.Provider>
-  );
-};
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth debe usarse dentro de AuthProvider");
-  }
-  return context;
+  )
 }
