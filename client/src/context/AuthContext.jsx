@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   // Configuración global de Axios
   useEffect(() => {
     axios.defaults.withCredentials = true;
-    axios.defaults.baseURL = "https://restaurante-6.onrender.com";
+    axios.defaults.baseURL = "https://restaurante-jbe5.onrender.com";
   }, []);
 
   const signUp = async (userData) => {

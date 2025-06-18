@@ -15,7 +15,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://restaurante-6.onrender.com',
+        target: 'https://restaurante-jbe5.onrender.com',
         changeOrigin: true,
         secure: false,
         ws: true,
