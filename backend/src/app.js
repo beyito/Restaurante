@@ -40,7 +40,7 @@ export const CreateApp = async ({
   app.use(json())
   app.use(express.json())
   app.use(cors({
-    origin: '*',
+    origin: 'https://restaurante-front.pages.dev',
     credentials: true
   }))
 
