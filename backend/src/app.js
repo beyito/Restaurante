@@ -39,7 +39,7 @@ export const CreateApp = async ({
   app.use(cookieParser());
   app.use(express.json());
   app.use(cors({
-    origin: 'https://restaurante-front.pages.dev',
+    origin: 'restaurante-front.pages.dev',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'FETCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
