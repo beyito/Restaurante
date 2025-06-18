@@ -34,7 +34,6 @@ export const CreateApp = async ({
 
   const app = express();
   const token = new Token(PALABRA_SECRETA);
-  const modeloAuth = new ModeloAuth(tokenService);
   // Configuración esencial
   app.use(helmet());
   app.use(cookieParser());
@@ -56,7 +55,7 @@ export const CreateApp = async ({
 
   db()
 
-  app.use('/auth', crearAuthRutas({ modeloAuth, token }))
+  app.use('/auth', crearAuthRutas({ modeloAuth}))
   app.use('/user', crearRutaUsuarios({ modeloUsuario, modeloBitacora })) // Hecho
   app.use('/admin', crearRutaAdministrador({ modeloAdministrador, token }))
   app.use('/permisos', crearRutasPermisos({ modeloPermiso, modeloBitacora })) // Hecho
