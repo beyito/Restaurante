@@ -32,21 +32,31 @@ export const CreateApp = async ({
   modeloPedido, modeloBitacora
 }) => {
 
-  const app = express()
-
-  const token = new Token(PALABRA_SECRETA)
-  modeloAuth.token = token
-  app.use(cookieParser())
-  app.use(json())
-  app.use(express.json())
+  const app = express();
+  const token = new Token(PALABRA_SECRETA);
+  const modeloAuth = new ModeloAuth(tokenService);
+  // Configuración esencial
+  app.use(helmet());
+  app.use(cookieParser());
+  app.use(express.json());
   app.use(cors({
     origin: 'https://restaurante-front.pages.dev',
-    credentials: true
-  }))
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'FETCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
+
+  // Headers adicionales
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Expose-Headers', 'Set-Cookie');
+    next();
+  });
+
 
   db()
 
-  app.use('/auth', crearAuthRutas({ modeloAuth }))
+  app.use('/auth', crearAuthRutas({ modeloAuth, token }))
   app.use('/user', crearRutaUsuarios({ modeloUsuario, modeloBitacora })) // Hecho
   app.use('/admin', crearRutaAdministrador({ modeloAdministrador, token }))
   app.use('/permisos', crearRutasPermisos({ modeloPermiso, modeloBitacora })) // Hecho

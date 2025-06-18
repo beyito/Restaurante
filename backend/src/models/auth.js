@@ -1,46 +1,53 @@
-import sequelize from '../config/db/config.js'
-import bcrypt from 'bcrypt'
-
-import { definicionUsuario } from '../services/user.js'
+import bcrypt from 'bcrypt';
+import sequelize from '../config/db/config.js';
+import { definicionUsuario } from '../services/user.js';
 
 export class ModeloAuth {
-  constructor (token) {
-    this.token = token
+  constructor(tokenService) {
+    this.tokenService = tokenService;
+    this.Usuario = sequelize.define('Usuario', definicionUsuario, {
+      timestamps: false,
+      freezeTableName: true
+    });
   }
 
-  static Usuario = sequelize.define('Usuario', definicionUsuario, {
-    timestamps: false,
-    freezeTableName: true
-  })
-
-  static async login ({ input }) {
-    const { nombreUsuario, password } = input.data
+  async login({ input }) {
     try {
-      const buscarUsuario = await this.Usuario.findOne({
-        where: { nombreUsuario }
-      })
-      if (!buscarUsuario) return { error: 'Usuario no encontrado' }
-      const verificarPassword = await bcrypt.compare(password, buscarUsuario.password)
-      if (!verificarPassword) return { error: 'Password incorrecto' }
-      const nuevoToken = this.token.crearToken({
-        id: buscarUsuario.id,
-        nombreUsuario: buscarUsuario.nombreUsuario,
-        rol: buscarUsuario.idRol
-      })
+      const { nombreUsuario, password } = input;
+      
+      const usuario = await this.Usuario.findOne({
+        where: { nombreUsuario },
+        attributes: ['id', 'nombreUsuario', 'correo', 'password', 'idRol']
+      });
+
+      if (!usuario) return { error: 'Credenciales inválidas' };
+
+      const passwordValido = await bcrypt.compare(password, usuario.password);
+      if (!passwordValido) return { error: 'Credenciales inválidas' };
+
+      const token = this.tokenService.crearToken({
+        id: usuario.id,
+        nombreUsuario: usuario.nombreUsuario,
+        rol: usuario.idRol
+      });
+
       return {
         user: {
-          nombreUsuario: buscarUsuario.nombreUsuario,
-          correo: buscarUsuario.correo,
-          rol: buscarUsuario.idRol
+          id: usuario.id,
+          nombreUsuario: usuario.nombreUsuario,
+          correo: usuario.correo,
+          rol: usuario.idRol
         },
-        nuevoToken
-      }
+        token
+      };
+
     } catch (error) {
-      throw new Error('Error al loguearse')
+      console.error('Error en ModeloAuth.login:', error);
+      throw new Error('Error en autenticación');
     }
   }
 
-  static async perfil ({ input }) {
+ async perfil ({ input }) {
     const id = input.id
     const user = await this.Usuario.findByPk(id)
     if (!user) return { error: 'Error: Usuario  no existente' }
