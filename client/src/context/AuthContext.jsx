@@ -44,6 +44,7 @@ export const AuthProvide = ({ children }) => {
 
   const signIn = async (user) => {
     try {
+      console.log(user)
       const res = await loginRequest(user)
       setUser(res.data)
       setIsAuthenticated(true)
