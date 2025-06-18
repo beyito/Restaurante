@@ -5,6 +5,7 @@ export const {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None',
+    domain: '.onrender.com',
     maxAge: 1000 * 60 * 60 * 2
   }
 } = process.env

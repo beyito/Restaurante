@@ -44,11 +44,11 @@ export const CreateApp = async ({
   app.use(cookieParser())
   app.use(json())
   app.use(express.json())
-  const corsOptions = {
-    origin: 'https://restaurante-m2i3.vercel.app', // cambia esto por el dominio real de tu frontend
-    credentials: true
-  }
-  app.use(cors(corsOptions))
+  app.use(cors({
+    origin: 'https://restaurante-m2i3.vercel.app',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }))
 
   db()
 
