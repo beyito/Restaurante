@@ -35,8 +35,6 @@ export const CreateApp = async ({
 
   const token = new Token(PALABRA_SECRETA)
   modeloAuth.token = token
-  app.disable('x-powered-by')
-  app.use(helmet())
   app.use(cookieParser())
   app.use(json())
   app.use(express.json())
