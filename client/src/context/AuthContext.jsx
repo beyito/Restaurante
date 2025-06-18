@@ -44,7 +44,6 @@ export const AuthProvide = ({ children }) => {
 
   const signIn = async (user) => {
     try {
-      console.log(user)
       const res = await loginRequest(user)
       setUser(res.data)
       setIsAuthenticated(true)
@@ -100,35 +99,34 @@ export const AuthProvide = ({ children }) => {
     }
   }, [errors])
   //para guardar la cookie con js-cookie
- useEffect(() => {
-  async function checkLogin() {
-    const cookies = Cookies.get();
+  useEffect(() => {
+    async function checkLogin() {
+      const cookies = Cookies.get()
 
-    if (!cookies.access_token) {
-      setIsAuthenticated(false)
-      setLoading(false)
-      return setUser(null)
-    }
-
-    try {
-      const res = await verifyTokenRequest()
-      if (!res.data) {
+      if (!cookies.access_token) {
+        setIsAuthenticated(false)
         setLoading(false)
-        return setIsAuthenticated(false)
+        return setUser(null)
       }
-      setIsAuthenticated(true)
-      setUser(res.data) // 👈 Aquí debería entrar bien
-      setLoading(false)
-    } catch (error) {
-      setIsAuthenticated(false)
-      setUser(null)
-      setLoading(false)
-      console.log(error)
+      try {
+        const res = await verifyTokenRequest(cookies.access_token)
+        if (!res.data) {
+          setLoading(false)
+          return setIsAuthenticated(false)
+        }
+        setIsAuthenticated(true)
+        setUser(res.data)
+        setLoading(false)
+      }
+      catch (error) {
+        setIsAuthenticated(false)
+        setUser(null)
+        setLoading(false)
+        console.log(error)
+      }
     }
-  }
-
-  checkLogin()
-}, [])
+    checkLogin()
+  }, [isAuthenticated])
 
   return (
     <AuthContext.Provider value={{
