@@ -127,7 +127,7 @@ export const AuthProvide = ({ children }) => {
   }
 
   checkLogin()
-}, [isAuthenticated])
+}, [])
 
   return (
     <AuthContext.Provider value={{
