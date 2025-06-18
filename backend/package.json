@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "build": "cd ../client && npm install && npm run build",
+    "build": "npm install && npm prune --production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
