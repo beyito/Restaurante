@@ -40,9 +40,7 @@ export const CreateApp = async ({
   app.use(express.json())
   app.use(cors({
     origin: 'https://restaurante-m2i3.vercel.app',
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['set-cookie']
+    credentials: true
   }))
 
   db()
