@@ -37,17 +37,14 @@ export const CreateApp = async ({
   modeloAuth.token = token
   app.disable('x-powered-by')
   app.use(helmet())
-  app.use((req, res, next) => {
-    res.set('Cache-Control', 'no-store')
-    next()
-  })
   app.use(cookieParser())
   app.use(json())
   app.use(express.json())
   app.use(cors({
     origin: 'https://restaurante-m2i3.vercel.app',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['set-cookie']
   }))
 
   db()
